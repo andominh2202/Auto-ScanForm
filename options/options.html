@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FormMaster AI - Bảng Điều Khiển & Quản Lý Hồ Sơ</title>
+  <link rel="icon" type="image/png" href="../icons/icon48.png">
+  <link rel="stylesheet" href="options.css">
+  <link rel="stylesheet" href="../content/floating-widget.css">
+</head>
+<body class="theme-dark">
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">🪄</div>
+        <div class="brand-text">
+          <h2>FormMaster AI</h2>
+          <span>Universal Form Filler</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="tab-profiles">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">Quản Lý Hồ Sơ</span>
+        </button>
+        <button class="nav-item" data-tab="tab-scanner">
+          <span class="nav-icon">🔗</span>
+          <span class="nav-label">Quét Form Bằng Link</span>
+          <span class="nav-pill" style="background:#10b981;">MỚI</span>
+        </button>
+        <button class="nav-item" data-tab="tab-playground">
+          <span class="nav-icon">🧪</span>
+          <span class="nav-label">Form Test Lab</span>
+          <span class="nav-pill">HOT</span>
+        </button>
+        <button class="nav-item" data-tab="tab-dictionary">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">Từ Điển Nhận Diện</span>
+        </button>
+        <button class="nav-item" data-tab="tab-guide">
+          <span class="nav-icon">🚀</span>
+          <span class="nav-label">Cài Đặt Extension</span>
+        </button>
+        <button class="nav-item" data-tab="tab-backup">
+          <span class="nav-icon">💾</span>
+          <span class="nav-label">Sao Lưu & Dữ Liệu</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="theme-toggle" id="theme-toggle">
+          <span id="theme-icon">🌙</span>
+          <span id="theme-text">Chế độ tối</span>
+        </div>
+        <div class="shortcut-tip">
+          Phím tắt nhanh: <kbd>Alt + Shift + F</kbd>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 id="page-heading">Quản Lý Hồ Sơ</h1>
+          <p id="page-subheading">Tạo và quản lý các bộ thông tin để điền biểu mẫu nhanh chóng</p>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-outline" id="btn-quick-test-top">
+            <span>🧪</span> Mở Test Lab
+          </button>
+          <button class="btn btn-primary" id="btn-save-all">
+            <span>💾</span> Lưu Thay Đổi
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB 1: Quản Lý Hồ Sơ (Profiles) -->
+      <section class="tab-pane active" id="tab-profiles">
+        <!-- Profile Picker Bar -->
+        <div class="profile-header-bar">
+          <div class="profile-tabs-scroll" id="profile-tabs-container">
+            <!-- Render tabs here -->
+          </div>
+          <div class="profile-actions-bar">
+            <button class="btn btn-sm btn-outline" id="btn-new-profile">
+              <span>➕</span> Tạo hồ sơ mới
+            </button>
+            <button class="btn btn-sm btn-outline" id="btn-duplicate-profile">
+              <span>📋</span> Nhân bản
+            </button>
+            <button class="btn btn-sm btn-danger" id="btn-delete-profile">
+              <span>🗑️</span> Xóa
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Profile Form Editor -->
+        <div class="profile-editor-container">
+          <!-- Thông tin cơ bản profile -->
+          <div class="editor-card profile-name-card">
+            <div class="field-row">
+              <div class="field-col flex-2">
+                <label class="field-label">Tên bộ hồ sơ này (Hiển thị trong menu chọn nhanh):</label>
+                <input type="text" id="prof-name-input" class="input-text" placeholder="Ví dụ: Hồ sơ xin việc IT, Thông tin cá nhân...">
+              </div>
+              <div class="field-col flex-1 checkbox-col">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="prof-is-default">
+                  <span>Đặt làm hồ sơ mặc định ưu tiên</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 1: Thông tin cá nhân & Liên hệ -->
+          <div class="editor-section">
+            <div class="section-title">
+              <span class="section-icon">👤</span>
+              <h3>1. Thông Tin Cá Nhân & Liên Hệ</h3>
+            </div>
+            <div class="section-grid">
+              <div class="form-group">
+                <label>Họ và tên đầy đủ *</label>
+                <input type="text" id="p-fullName" class="input-text" placeholder="Nguyễn Văn An">
+              </div>
+              <div class="form-group">
+                <label>Họ / Họ đệm</label>
+                <input type="text" id="p-lastName" class="input-text" placeholder="Nguyễn Văn">
+              </div>
+              <div class="form-group">
+                <label>Tên</label>
+                <input type="text" id="p-firstName" class="input-text" placeholder="An">
+              </div>
+              <div class="form-group">
+                <label>Email liên hệ *</label>
+                <input type="email" id="p-email" class="input-text" placeholder="an.nguyen@gmail.com">
+              </div>
+              <div class="form-group">
+                <label>Số điện thoại chính *</label>
+                <input type="tel" id="p-phone" class="input-text" placeholder="0988123456">
+              </div>
+              <div class="form-group">
+                <label>Số điện thoại phụ / Zalo</label>
+                <input type="tel" id="p-phoneBackup" class="input-text" placeholder="0912345678">
+              </div>
+              <div class="form-group">
+                <label>Ngày sinh (Date of birth)</label>
+                <input type="date" id="p-dob" class="input-text">
+              </div>
+              <div class="form-group">
+                <label>Giới tính</label>
+                <select id="p-gender" class="input-select">
+                  <option value="Nam">Nam</option>
+                  <option value="Nữ">Nữ</option>
+                  <option value="Khác">Khác / Không tiết lộ</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Số CCCD / CMND / Hộ chiếu</label>
+                <input type="text" id="p-idCard" class="input-text" placeholder="001098012345">
+              </div>
+              <div class="form-group">
+                <label>Quốc tịch</label>
+                <input type="text" id="p-nationality" class="input-text" placeholder="Việt Nam">
+              </div>
+              <div class="form-group">
+                <label>Tình trạng hôn nhân</label>
+                <select id="p-maritalStatus" class="input-select">
+                  <option value="Độc thân">Độc thân</option>
+                  <option value="Đã kết hôn">Đã kết hôn</option>
+                  <option value="Khác">Khác</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Địa chỉ & Cư trú -->
+          <div class="editor-section">
+            <div class="section-title">
+              <span class="section-icon">📍</span>
+              <h3>2. Địa Chỉ & Nơi Cư Trú / Giao Hàng</h3>
+            </div>
+            <div class="section-grid">
+              <div class="form-group full-width">
+                <label>Địa chỉ chi tiết (Số nhà, ngõ, tên đường) *</label>
+                <input type="text" id="p-address" class="input-text" placeholder="Số 88 Đường Cầu Giấy, Phường Dịch Vọng">
+              </div>
+              <div class="form-group">
+                <label>Tỉnh / Thành phố</label>
+                <input type="text" id="p-city" class="input-text" placeholder="Hà Nội / TP. Hồ Chí Minh / Đà Nẵng...">
+              </div>
+              <div class="form-group">
+                <label>Quận / Huyện</label>
+                <input type="text" id="p-district" class="input-text" placeholder="Quận Cầu Giấy / Quận 1...">
+              </div>
+              <div class="form-group">
+                <label>Phường / Xã / Thị trấn</label>
+                <input type="text" id="p-ward" class="input-text" placeholder="Phường Dịch Vọng / Phường Bến Nghé...">
+              </div>
+              <div class="form-group">
+                <label>Quốc gia</label>
+                <input type="text" id="p-country" class="input-text" placeholder="Việt Nam">
+              </div>
+              <div class="form-group">
+                <label>Mã bưu điện (Zip / Postal Code)</label>
+                <input type="text" id="p-zipCode" class="input-text" placeholder="100000 / 700000">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Học vấn & Bằng cấp -->
+          <div class="editor-section">
+            <div class="section-title">
+              <span class="section-icon">🎓</span>
+              <h3>3. Học Vấn & Bằng Cấp</h3>
+            </div>
+            <div class="section-grid">
+              <div class="form-group">
+                <label>Trường Đại học / Cao đẳng / Học viện</label>
+                <input type="text" id="p-university" class="input-text" placeholder="Đại học Bách Khoa Hà Nội">
+              </div>
+              <div class="form-group">
+                <label>Chuyên ngành học (Major)</label>
+                <input type="text" id="p-major" class="input-text" placeholder="Công nghệ thông tin / Kinh tế...">
+              </div>
+              <div class="form-group">
+                <label>Trình độ / Bằng cấp cao nhất</label>
+                <select id="p-educationLevel" class="input-select">
+                  <option value="Đại học">Đại học</option>
+                  <option value="Thạc sĩ">Thạc sĩ</option>
+                  <option value="Tiến sĩ">Tiến sĩ</option>
+                  <option value="Cao đẳng">Cao đẳng</option>
+                  <option value="Trung cấp">Trung cấp</option>
+                  <option value="Trung học phổ thông">Trung học phổ thông</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Năm tốt nghiệp (Graduation Year)</label>
+                <input type="text" id="p-gradYear" class="input-text" placeholder="2020">
+              </div>
+              <div class="form-group">
+                <label>Điểm trung bình (GPA)</label>
+                <input type="text" id="p-gpa" class="input-text" placeholder="3.6/4.0">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Tuyển dụng & Kinh nghiệm -->
+          <div class="editor-section">
+            <div class="section-title">
+              <span class="section-icon">💼</span>
+              <h3>4. Kinh Nghiệm Làm Việc & Tuyển Dụng</h3>
+            </div>
+            <div class="section-grid">
+              <div class="form-group">
+                <label>Vị trí ứng tuyển / Chức danh hiện tại</label>
+                <input type="text" id="p-jobTitle" class="input-text" placeholder="Senior Fullstack Developer / Marketing Lead...">
+              </div>
+              <div class="form-group">
+                <label>Số năm kinh nghiệm</label>
+                <input type="text" id="p-experienceYears" class="input-text" placeholder="4">
+              </div>
+              <div class="form-group">
+                <label>Công ty hiện tại / gần nhất</label>
+                <input type="text" id="p-currentCompany" class="input-text" placeholder="FPT Software / VNG...">
+              </div>
+              <div class="form-group">
+                <label>Mức lương mong muốn (Expected Salary)</label>
+                <input type="text" id="p-expectedSalary" class="input-text" placeholder="35.000.000 VNĐ / Thỏa thuận">
+              </div>
+              <div class="form-group full-width">
+                <label>Kỹ năng chính (Skills / Tech stack)</label>
+                <input type="text" id="p-skills" class="input-text" placeholder="JavaScript, React, Node.js, Python, AWS...">
+              </div>
+              <div class="form-group full-width">
+                <label>Thư giới thiệu / Cover Letter / Giới thiệu bản thân</label>
+                <textarea id="p-coverLetter" class="input-textarea" rows="4" placeholder="Kính gửi quý công ty, tôi là..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 5: Liên kết & Mạng xã hội -->
+          <div class="editor-section">
+            <div class="section-title">
+              <span class="section-icon">🌐</span>
+              <h3>5. Liên Kết Mạng Xã Hội & Portfolio</h3>
+            </div>
+            <div class="section-grid">
+              <div class="form-group">
+                <label>Link LinkedIn</label>
+                <input type="url" id="p-linkedin" class="input-text" placeholder="https://linkedin.com/in/nguyenvanan">
+              </div>
+              <div class="form-group">
+                <label>Link GitHub</label>
+                <input type="url" id="p-github" class="input-text" placeholder="https://github.com/nguyenvanan">
+              </div>
+              <div class="form-group">
+                <label>Website cá nhân / Portfolio</label>
+                <input type="url" id="p-portfolio" class="input-text" placeholder="https://nguyenvanan.dev">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 6: Trường tùy chỉnh mở rộng (Custom Fields) -->
+          <div class="editor-section">
+            <div class="section-title">
+              <span class="section-icon">⚙️</span>
+              <h3>6. Trường Tùy Chỉnh Riêng (Custom Fields)</h3>
+              <p class="section-desc">Tự thêm bất kỳ trường dữ liệu nào khác bạn muốn form tự động điền</p>
+            </div>
+
+            <div class="custom-fields-table" id="custom-fields-container">
+              <!-- Render custom field rows -->
+            </div>
+
+            <button class="btn btn-sm btn-outline mt-3" id="btn-add-custom-field">
+              <span>➕</span> Thêm trường tùy chỉnh
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: Quét & Điền Bằng Link (Google Forms URL Scanner) -->
+      <section class="tab-pane" id="tab-scanner">
+        <div class="scanner-hero">
+          <div class="intro-badge">⚡ TỰ ĐỘNG PHÂN TÍCH & ĐIỀN FORM TỪ LINK</div>
+          <h2>Quét & Điền Bằng Link Google Forms</h2>
+          <p>Dán link Google Form bất kỳ vào đây. Hệ thống sẽ tự động bóc tách toàn bộ câu hỏi, so khớp với thông tin hồ sơ của bạn và tạo đường link điền sẵn 100%!</p>
+        </div>
+
+        <!-- Input Box -->
+        <div class="scanner-input-card">
+          <div class="scanner-input-group">
+            <div class="scanner-url-field">
+              <span class="url-icon">🔗</span>
+              <input type="url" id="scanner-url-input" class="input-text-lg" placeholder="Dán link Google Form (https://docs.google.com/forms/d/e/.../viewform) vào đây...">
+              <button class="btn btn-primary btn-lg" id="btn-start-scan">
+                <span>🔍</span> Quét Form Ngay
+              </button>
+            </div>
+            
+            <div class="scanner-options-row">
+              <div class="scanner-profile-picker">
+                <label>Hồ sơ dùng để điền:</label>
+                <select id="scanner-profile-select" class="input-select-inline"></select>
+              </div>
+              <div class="scanner-demo-links">
+                <span>Hoặc thử mẫu demo:</span>
+                <button class="btn-demo-link" id="btn-load-demo-survey">📋 Khảo Sát Demo</button>
+                <button class="btn-demo-link" id="btn-load-demo-job">💼 Ứng Tuyển Demo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="scanner-loading" id="scanner-loading" style="display: none;">
+          <div class="spinner"></div>
+          <p>Đang phân tích cấu trúc Google Form và câu hỏi...</p>
+        </div>
+
+        <!-- Result Container -->
+        <div class="scanner-result-container" id="scanner-result-container" style="display: none;">
+          <div class="form-summary-card">
+            <div class="summary-left">
+              <span class="form-badge-icon">📋</span>
+              <div>
+                <h3 id="scanned-form-title">Tiêu đề Form</h3>
+                <p id="scanned-form-desc">Mô tả form...</p>
+              </div>
+            </div>
+            <div class="summary-right">
+              <span class="badge-count" id="scanned-q-count">0 câu hỏi</span>
+            </div>
+          </div>
+
+          <!-- Questions Table -->
+          <div class="scanned-table-wrap">
+            <table class="scanned-table">
+              <thead>
+                <tr>
+                  <th style="width: 32%;">Câu Hỏi Trên Google Form</th>
+                  <th style="width: 18%;">Loại Câu Hỏi</th>
+                  <th style="width: 38%;">Câu Trả Lời Tự Động (Có Thể Chỉnh Sửa)</th>
+                  <th style="width: 12%;">Độ Tin Cậy</th>
+                </tr>
+              </thead>
+              <tbody id="scanned-table-body">
+                <!-- Render bằng JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Action Bar -->
+          <div class="scanner-actions-bar">
+            <button class="btn btn-primary btn-lg" id="btn-open-prefilled">
+              <span>🚀</span> Mở Google Form Đã Điền Sẵn 100%
+            </button>
+            <button class="btn btn-secondary" id="btn-copy-prefilled">
+              <span>📋</span> Sao Chép Link Đã Điền
+            </button>
+            <button class="btn btn-outline" id="btn-rescan">
+              <span>🔄</span> Quét Lại
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: Form Playground & Test Lab -->
+      <section class="tab-pane" id="tab-playground">
+        <div class="playground-intro">
+          <div class="intro-badge">🧪 LIVE INTERACTIVE PLAYGROUND</div>
+          <h2>Phòng Thử Nghiệm Điền Form Thực Tế</h2>
+          <p>Trải nghiệm tốc độ và độ chính xác của FormMaster AI trên các mẫu form thực tế phổ biến nhất hiện nay.</p>
+        </div>
+
+        <!-- Playground Selector Tabs -->
+        <div class="playground-tabs">
+          <button class="pg-tab active" data-form="form-job">💼 1. Đơn Ứng Tuyển Việc Làm (TopCV/Lever)</button>
+          <button class="pg-tab" data-form="form-gform">📋 2. Google Forms Simulator (Chuẩn 100%)</button>
+          <button class="pg-tab" data-form="form-checkout">🛒 3. Đơn Đặt Hàng & Giao Nhận (Checkout)</button>
+          <button class="pg-tab" data-form="form-survey">📊 4. Khảo Sát & Đăng Ký Sự Kiện</button>
+        </div>
+
+        <!-- Floating Test Action Bar for Playground -->
+        <div class="playground-control-bar">
+          <div class="pg-profile-select-wrap">
+            <span>Dùng hồ sơ:</span>
+            <select id="pg-profile-picker" class="input-select-inline"></select>
+          </div>
+          <div class="pg-actions">
+            <button class="btn btn-primary" id="btn-pg-fill">
+              <span>⚡</span> Thử Điền Form Này
+            </button>
+            <button class="btn btn-secondary" id="btn-pg-random">
+              <span>🎲</span> Dữ Liệu Test Ngẫu Nhiên
+            </button>
+            <button class="btn btn-outline" id="btn-pg-clear">
+              <span>🧹</span> Xóa Trắng
+            </button>
+          </div>
+        </div>
+
+        <div class="pg-stats-bar" id="pg-stats-bar" style="display: none;">
+          <span class="stats-icon">⚡</span>
+          <span id="pg-stats-text">Đã điền thành công 8/8 trường trong 0.04s!</span>
+        </div>
+
+        <!-- FORM 1: Job Application Form -->
+        <div class="test-form-wrapper active" id="form-job">
+          <div class="test-form-card">
+            <div class="form-header">
+              <h3>Đơn Ứng Tuyển: Kỹ Sư Phần Mềm / Chuyên Viên Công Nghệ</h3>
+              <p>Vui lòng điền thông tin chính xác để bộ phận tuyển dụng liên hệ phỏng vấn.</p>
+            </div>
+            <div class="test-form-body">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label>Họ và tên ứng viên <span class="req">*</span></label>
+                  <input type="text" name="applicant_fullname" class="input-text" placeholder="Nhập họ và tên...">
+                </div>
+                <div class="form-group">
+                  <label>Địa chỉ email liên hệ <span class="req">*</span></label>
+                  <input type="email" name="applicant_email" class="input-text" placeholder="example@domain.com">
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label>Số điện thoại di động <span class="req">*</span></label>
+                  <input type="tel" name="applicant_phone" class="input-text" placeholder="098xxxxxxx">
+                </div>
+                <div class="form-group">
+                  <label>Số năm kinh nghiệm làm việc <span class="req">*</span></label>
+                  <input type="text" name="experience_years" class="input-text" placeholder="Ví dụ: 3 năm">
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label>Vị trí ứng tuyển mong muốn</label>
+                  <input type="text" name="desired_position" class="input-text" placeholder="Ví dụ: Frontend Engineer">
+                </div>
+                <div class="form-group">
+                  <label>Mức lương mong muốn (Gross)</label>
+                  <input type="text" name="expected_salary" class="input-text" placeholder="Ví dụ: 30.000.000 VNĐ">
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label>Trường đại học tốt nghiệp</label>
+                  <input type="text" name="university_name" class="input-text" placeholder="Trường ĐH...">
+                </div>
+                <div class="form-group">
+                  <label>Chuyên ngành học</label>
+                  <input type="text" name="major_subject" class="input-text" placeholder="CNTT, Hệ thống thông tin...">
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label>Link Profile LinkedIn</label>
+                  <input type="url" name="linkedin_profile_url" class="input-text" placeholder="https://linkedin.com/in/...">
+                </div>
+                <div class="form-group">
+                  <label>Link GitHub / Portfolio</label>
+                  <input type="url" name="github_profile_url" class="input-text" placeholder="https://github.com/...">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Kỹ năng chuyên môn / Công nghệ làm chủ</label>
+                <input type="text" name="technical_skills" class="input-text" placeholder="React, Node.js, Docker, Python...">
+              </div>
+              <div class="form-group">
+                <label>Thư giới thiệu bản thân & Lý do ứng tuyển (Cover Letter)</label>
+                <textarea name="applicant_cover_letter" class="input-textarea" rows="4" placeholder="Nêu vắn tắt thế mạnh và lý do muốn gia nhập công ty..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORM 2: Google Forms Simulator -->
+        <div class="test-form-wrapper" id="form-gform">
+          <div class="gform-container">
+            <div class="gform-banner"></div>
+            <div class="gform-header-card">
+              <h2 class="gform-main-title">Biểu mẫu khảo sát thông tin & Đăng ký dịch vụ</h2>
+              <p class="gform-main-desc">Mô phỏng 100% cấu trúc DOM, lớp CSS và cách hoạt động của Google Forms thật</p>
+              <div class="gform-req-note">* Biểu thị câu hỏi bắt buộc</div>
+            </div>
+
+            <!-- GForm Question 1: Text -->
+            <div class="gform-card Qr7Oae">
+              <div class="gform-q-title" role="heading">1. Họ và tên của bạn <span class="req">*</span></div>
+              <div class="gform-input-wrap">
+                <input type="text" class="whsOnd gform-text-input" placeholder="Câu trả lời của bạn">
+              </div>
+            </div>
+
+            <!-- GForm Question 2: Email -->
+            <div class="gform-card Qr7Oae">
+              <div class="gform-q-title" role="heading">2. Địa chỉ email nhận thông báo <span class="req">*</span></div>
+              <div class="gform-input-wrap">
+                <input type="email" class="whsOnd gform-text-input" placeholder="Câu trả lời của bạn">
+              </div>
+            </div>
+
+            <!-- GForm Question 3: Phone -->
+            <div class="gform-card Qr7Oae">
+              <div class="gform-q-title" role="heading">3. Số điện thoại liên lạc <span class="req">*</span></div>
+              <div class="gform-input-wrap">
+                <input type="tel" class="whsOnd gform-text-input" placeholder="Câu trả lời của bạn">
+              </div>
+            </div>
+
+            <!-- GForm Question 4: Radio (Giới tính) -->
+            <div class="gform-card Qr7Oae">
+              <div class="gform-q-title" role="heading">4. Giới tính <span class="req">*</span></div>
+              <div class="gform-radio-group" role="radiogroup">
+                <label class="gform-radio-option">
+                  <div class="gform-radio-circle" role="radio" data-value="Nam" aria-checked="false"></div>
+                  <span>Nam</span>
+                </label>
+                <label class="gform-radio-option">
+                  <div class="gform-radio-circle" role="radio" data-value="Nữ" aria-checked="false"></div>
+                  <span>Nữ</span>
+                </label>
+                <label class="gform-radio-option">
+                  <div class="gform-radio-circle" role="radio" data-value="Khác" aria-checked="false"></div>
+                  <span>Khác</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- GForm Question 5: Date (Ngày sinh) -->
+            <div class="gform-card Qr7Oae">
+              <div class="gform-q-title" role="heading">5. Ngày tháng năm sinh</div>
+              <div class="gform-input-wrap">
+                <input type="date" class="whsOnd gform-text-input">
+              </div>
+            </div>
+
+            <!-- GForm Question 6: Dropdown (Trình độ học vấn) -->
+            <div class="gform-card Qr7Oae">
+              <div class="gform-q-title" role="heading">6. Trình độ học vấn cao nhất</div>
+              <div class="gform-input-wrap">
+                <select class="whsOnd input-select">
+                  <option value="">Chọn trình độ...</option>
+                  <option value="Đại học">Đại học</option>
+                  <option value="Thạc sĩ">Thạc sĩ</option>
+                  <option value="Tiến sĩ">Tiến sĩ</option>
+                  <option value="Cao đẳng">Cao đẳng</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- GForm Question 7: Textarea (Ý kiến góp ý) -->
+            <div class="gform-card Qr7Oae">
+              <div class="gform-q-title" role="heading">7. Ý kiến đóng góp hoặc ghi chú thêm</div>
+              <div class="gform-input-wrap">
+                <textarea class="KHxj8b gform-textarea" rows="3" placeholder="Câu trả lời của bạn"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORM 3: Checkout Form -->
+        <div class="test-form-wrapper" id="form-checkout">
+          <div class="test-form-card">
+            <div class="form-header">
+              <h3>Địa Chỉ Nhận Hàng & Thanh Toán (E-Commerce Checkout)</h3>
+              <p>Mẫu biểu mẫu thanh toán chuẩn Shopee, Lazada, Tiki, TikTok Shop.</p>
+            </div>
+            <div class="test-form-body">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label>Họ và tên người nhận hàng <span class="req">*</span></label>
+                  <input type="text" name="shipping_fullname" class="input-text" placeholder="Nguyễn Văn An">
+                </div>
+                <div class="form-group">
+                  <label>Số điện thoại nhận hàng <span class="req">*</span></label>
+                  <input type="tel" name="shipping_phone" class="input-text" placeholder="098xxxxxxx">
+                </div>
+              </div>
+              <div class="form-row-3">
+                <div class="form-group">
+                  <label>Tỉnh / Thành phố <span class="req">*</span></label>
+                  <input type="text" name="shipping_city" class="input-text" placeholder="Hà Nội">
+                </div>
+                <div class="form-group">
+                  <label>Quận / Huyện <span class="req">*</span></label>
+                  <input type="text" name="shipping_district" class="input-text" placeholder="Quận Cầu Giấy">
+                </div>
+                <div class="form-group">
+                  <label>Phường / Xã <span class="req">*</span></label>
+                  <input type="text" name="shipping_ward" class="input-text" placeholder="Phường Dịch Vọng">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Địa chỉ chi tiết (Số nhà, tên ngõ, tên đường) <span class="req">*</span></label>
+                <input type="text" name="shipping_address" class="input-text" placeholder="Số 88 Đường Cầu Giấy">
+              </div>
+              <div class="form-group">
+                <label>Lời dặn / Ghi chú cho tài xế giao hàng</label>
+                <textarea name="shipping_notes" class="input-textarea" rows="2" placeholder="Giao hàng giờ hành chính, gọi trước khi đến 15 phút..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORM 4: Survey Form -->
+        <div class="test-form-wrapper" id="form-survey">
+          <div class="test-form-card">
+            <div class="form-header">
+              <h3>Đăng Ký Tham Gia Hội Thảo Công Nghệ & Khảo Sát</h3>
+              <p>Mẫu đăng ký sự kiện kết hợp lấy ý kiến người tham dự.</p>
+            </div>
+            <div class="test-form-body">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label>Tên người tham gia</label>
+                  <input type="text" name="attendee_name" class="input-text" placeholder="Họ và tên...">
+                </div>
+                <div class="form-group">
+                  <label>Email liên hệ</label>
+                  <input type="email" name="attendee_email" class="input-text" placeholder="email@domain.com">
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label>Số điện thoại di động</label>
+                  <input type="tel" name="attendee_phone" class="input-text" placeholder="09xxxxxxxx">
+                </div>
+                <div class="form-group">
+                  <label>Đơn vị công tác / Công ty hiện tại</label>
+                  <input type="text" name="attendee_company" class="input-text" placeholder="Tên công ty / trường...">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Vị trí công tác hiện tại</label>
+                <input type="text" name="attendee_role" class="input-text" placeholder="Kỹ sư, Sinh viên, Quản lý...">
+              </div>
+              <div class="form-group">
+                <label>Góp ý hoặc câu hỏi bạn muốn thảo luận tại hội thảo</label>
+                <textarea name="attendee_feedback" class="input-textarea" rows="3" placeholder="Chia sẻ chủ đề bạn quan tâm..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: Từ Điển Nhận Diện (Semantic Dictionary) -->
+      <section class="tab-pane" id="tab-dictionary">
+        <div class="dict-header">
+          <h2>Bộ Từ Điển Nhận Diện Ngữ Nghĩa (30+ Trường)</h2>
+          <p>Hệ thống tự động so khớp các từ khóa tiếng Việt & tiếng Anh trên nhãn, placeholder, name, id và aria-label.</p>
+          <div class="dict-search-box">
+            <input type="text" id="dict-search-input" class="input-text" placeholder="🔍 Tìm kiếm trường (vd: họ tên, cccd, lương, email...)">
+          </div>
+        </div>
+
+        <div class="dict-table-container">
+          <table class="dict-table">
+            <thead>
+              <tr>
+                <th style="width: 22%;">Trường Dữ Liệu</th>
+                <th style="width: 15%;">Mã Key</th>
+                <th style="width: 50%;">Từ Khóa Nhận Diện (Việt & Anh)</th>
+                <th style="width: 13%;">Độ Ưu Tiên</th>
+              </tr>
+            </thead>
+            <tbody id="dict-table-body">
+              <!-- Sẽ render bằng JS từ FormMasterRules -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 4: Hướng Dẫn Cài Đặt Extension -->
+      <section class="tab-pane" id="tab-guide">
+        <div class="guide-container">
+          <div class="guide-hero">
+            <div class="guide-hero-badge">CHỈ 3 BƯỚC ĐƠN GIẢN</div>
+            <h2>Hướng Dẫn Cài Đặt Vào Chrome / Edge</h2>
+            <p>FormMaster AI được đóng gói theo chuẩn Manifest V3 mới nhất, có thể nạp trực tiếp vào trình duyệt trong 10 giây mà không cần đưa lên Chrome Web Store.</p>
+          </div>
+
+          <div class="guide-steps-grid">
+            <div class="step-card">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <h3>Mở Trang Quản Lý Tiện Ích</h3>
+                <p>Nhập địa chỉ sau vào thanh tìm kiếm của trình duyệt và nhấn <b>Enter</b>:</p>
+                <div class="code-pill">
+                  <code>chrome://extensions</code> hoặc <code>edge://extensions</code>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <h3>Bật Chế Độ Nhà Phát Triển</h3>
+                <p>Ở góc trên bên phải màn hình, gạt công tắc <b>"Chế độ dành cho nhà phát triển" (Developer mode)</b> sang trạng thái <b>BẬT (ON)</b>.</p>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <h3>Tải Tiện Ích Đã Giải Nén</h3>
+                <p>Bấm nút <b>"Tải tiện ích đã giải nén" (Load unpacked)</b> ở góc trên bên trái, sau đó chọn thư mục:</p>
+                <div class="code-pill">
+                  <code id="folder-path-display">d:\AppForm</code>
+                  <button class="btn-copy-path" id="btn-copy-path" title="Sao chép đường dẫn">📋</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="guide-success-banner">
+            <span class="success-icon">🎉</span>
+            <div>
+              <h4>Hoàn tất! Tiện ích đã sẵn sàng hoạt động</h4>
+              <p>Mở bất kỳ trang web nào (Google Forms, TopCV, web tuyển dụng, đăng ký dịch vụ...), bạn sẽ thấy nút nổi <b>🪄 FormMaster</b> ở góc dưới bên phải hoặc chỉ cần nhấn tổ hợp phím <b>Alt + Shift + F</b> để điền toàn bộ trang trong 1 giây!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: Sao Lưu & Dữ Liệu (Backup) -->
+      <section class="tab-pane" id="tab-backup">
+        <div class="backup-grid">
+          <!-- Xuất JSON -->
+          <div class="backup-card">
+            <div class="backup-card-icon">📤</div>
+            <h3>Xuất Dữ Liệu (Export JSON)</h3>
+            <p>Tải toàn bộ hồ sơ và trường tùy chỉnh về máy tính dưới định dạng file JSON để sao lưu hoặc chuyển sang máy khác.</p>
+            <button class="btn btn-primary" id="btn-export-json">
+              <span>📥</span> Tải File JSON Hồ Sơ
+            </button>
+          </div>
+
+          <!-- Nhập JSON -->
+          <div class="backup-card">
+            <div class="backup-card-icon">📥</div>
+            <h3>Nhập Dữ Liệu (Import JSON)</h3>
+            <p>Khôi phục hồ sơ đã sao lưu từ file JSON trên máy tính của bạn.</p>
+            <input type="file" id="file-import-json" accept=".json" style="display: none;">
+            <button class="btn btn-secondary" id="btn-trigger-import">
+              <span>📂</span> Chọn File JSON Để Nhập
+            </button>
+          </div>
+
+          <!-- Khôi phục mặc định -->
+          <div class="backup-card">
+            <div class="backup-card-icon">🔄</div>
+            <h3>Khôi Phục Hồ Sơ Mẫu Mặc Định</h3>
+            <p>Nạp lại 3 bộ hồ sơ mẫu chuẩn Việt Nam (Xin việc IT, Mua hàng Checkout, Khảo sát Google Forms).</p>
+            <button class="btn btn-outline" id="btn-reset-defaults">
+              <span>♻️</span> Khôi Phục Dữ Liệu Mẫu
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Notification Toast -->
+  <div class="app-toast" id="app-toast"></div>
+
+  <!-- Scripts -->
+  <script src="../data/default-profiles.js"></script>
+  <script src="../content/rules.js"></script>
+  <script src="../content/detector.js"></script>
+  <script src="../content/form-filler.js"></script>
+  <script src="../content/gform-parser.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

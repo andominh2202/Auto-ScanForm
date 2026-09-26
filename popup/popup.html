@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FormMaster AI</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-icon">🪄</div>
+        <div>
+          <h1 class="brand-title">FormMaster AI</h1>
+          <p class="brand-subtitle">Trợ lý điền mọi loại form</p>
+        </div>
+      </div>
+      <span class="status-badge" id="status-badge">⚡ Sẵn sàng</span>
+    </header>
+
+    <!-- Profile Selector -->
+    <div class="section profile-section">
+      <label class="section-label" for="profile-select">HỒ SƠ HIỆN TẠI</label>
+      <div class="select-wrapper">
+        <select id="profile-select" class="custom-select">
+          <option value="">Đang tải hồ sơ...</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Page Status Card -->
+    <div class="card status-card">
+      <div class="status-card-inner">
+        <div class="card-icon" id="page-icon">🌐</div>
+        <div class="card-info">
+          <span class="card-title" id="page-title">Trang hiện tại</span>
+          <span class="card-count" id="field-count">Đang quét các ô nhập...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Action Button -->
+    <button class="btn btn-primary" id="btn-fill-now">
+      <span class="btn-icon">⚡</span>
+      <span class="btn-text">Điền Form Tự Động</span>
+      <span class="btn-shortcut">Alt+Shift+F</span>
+    </button>
+
+    <!-- Secondary Actions -->
+    <div class="action-grid">
+      <button class="btn btn-secondary" id="btn-highlight">
+        <span>🎯</span>
+        <span>Soi trường</span>
+      </button>
+      <button class="btn btn-secondary" id="btn-random-test">
+        <span>🎲</span>
+        <span>Dữ liệu Test</span>
+      </button>
+    </div>
+
+    <!-- Quick Copy Drawer -->
+    <div class="section quick-copy-section">
+      <label class="section-label">SAO CHÉP NHANH THÔNG TIN</label>
+      <div class="quick-copy-chips" id="quick-copy-chips">
+        <!-- Sẽ được điền bằng JS -->
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <button class="footer-link" id="link-options">
+        <span>⚙️</span>
+        <span>Hồ sơ</span>
+      </button>
+      <button class="footer-link" id="link-scanner">
+        <span>🔗</span>
+        <span>Quét Link Form</span>
+      </button>
+      <button class="footer-link" id="link-playground">
+        <span>🧪</span>
+        <span>Test Lab</span>
+      </button>
+    </footer>
+  </div>
+
+  <script src="../data/default-profiles.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
