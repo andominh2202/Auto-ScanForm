@@ -486,11 +486,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         currentScannedUrl = url;
 
-        // 1. Nếu đang chạy trong Chrome Extension: Yêu cầu background service worker fetch trực tiếp
-        if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
+        // 1. Nếu đang chạy local (localhost/127.0.0.1): Gọi ngay qua Python server proxy (nhanh & ổn định nhất)
+        if (!formData && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+          try {
+            const apiUrl = `/api/scan-form?url=${encodeURIComponent(url)}`;
+            const res = await fetch(apiUrl);
+            if (res.ok) {
+              const json = await res.json();
+              if (json && json.success && json.questions && json.questions.length > 0) {
+                formData = json;
+              }
+            }
+          } catch (netErr) {
+            console.warn("[Scanner] Local proxy fetch failed:", netErr);
+          }
+        }
+
+        // 2. Nếu đang chạy trong Chrome Extension: Yêu cầu background service worker fetch trực tiếp
+        if (!formData && window.location.protocol === "chrome-extension:" && typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
           try {
             const bgRes = await new Promise((resolve) => {
+              const timer = setTimeout(() => resolve(null), 3000);
               chrome.runtime.sendMessage({ action: "FETCH_GFORM_HTML", url }, res => {
+                clearTimeout(timer);
                 if (chrome.runtime.lastError || !res) {
                   resolve(null);
                 } else {
@@ -515,7 +533,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         }
 
-        // 2. Thử gọi qua Content Script Bridge (nếu mở trên GitHub Pages nhưng trình duyệt ĐÃ CÀI Extension)
+        // 3. Thử gọi qua Content Script Bridge (nếu mở trên GitHub Pages nhưng trình duyệt ĐÃ CÀI Extension)
         if (!formData) {
           try {
             const bridgeRes = await new Promise(resolve => {
@@ -548,22 +566,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
           } catch (e) {
             console.warn("[Scanner] Content script bridge skipped:", e);
-          }
-        }
-
-        // 3. Nếu đang chạy local (localhost/127.0.0.1): Thử gọi qua Python server proxy
-        if (!formData && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
-          try {
-            const apiUrl = `/api/scan-form?url=${encodeURIComponent(url)}`;
-            const res = await fetch(apiUrl);
-            if (res.ok) {
-              const json = await res.json();
-              if (json && json.success && json.questions && json.questions.length > 0) {
-                formData = json;
-              }
-            }
-          } catch (netErr) {
-            console.warn("[Scanner] Local proxy fetch skipped:", netErr);
           }
         }
 
