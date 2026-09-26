@@ -502,22 +502,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         }
 
-        // 2. Nếu đang chạy trong Chrome Extension: Yêu cầu background service worker fetch trực tiếp
-        if (!formData && window.location.protocol === "chrome-extension:" && typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
+        // 2. Nếu đang chạy trong Chrome Extension:
+        if (!formData && window.location.protocol === "chrome-extension:") {
+          // 2a. Thử fetch trực tiếp qua host_permissions của extension
           try {
-            const bgRes = await new Promise((resolve) => {
-              const timer = setTimeout(() => resolve(null), 3000);
-              chrome.runtime.sendMessage({ action: "FETCH_GFORM_HTML", url }, res => {
-                clearTimeout(timer);
-                if (chrome.runtime.lastError || !res) {
-                  resolve(null);
-                } else {
-                  resolve(res);
-                }
-              });
-            });
-            if (bgRes && bgRes.success && bgRes.html) {
-              const parsed = window.GoogleFormParser ? window.GoogleFormParser.parseFormHtml(bgRes.html) : null;
+            const extRes = await fetch(url);
+            if (extRes.ok) {
+              const html = await extRes.text();
+              const parsed = window.GoogleFormParser ? window.GoogleFormParser.parseFormHtml(html) : null;
               if (parsed && parsed.questions && parsed.questions.length > 0) {
                 formData = {
                   success: true,
@@ -529,7 +521,38 @@ document.addEventListener("DOMContentLoaded", async () => {
               }
             }
           } catch (e) {
-            console.warn("[Scanner] Extension background fetch skipped:", e);
+            console.warn("[Scanner] Direct extension fetch failed, trying service worker:", e);
+          }
+
+          // 2b. Thử qua background service worker
+          if (!formData && typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
+            try {
+              const bgRes = await new Promise((resolve) => {
+                const timer = setTimeout(() => resolve(null), 4000);
+                chrome.runtime.sendMessage({ action: "FETCH_GFORM_HTML", url }, res => {
+                  clearTimeout(timer);
+                  if (chrome.runtime.lastError || !res) {
+                    resolve(null);
+                  } else {
+                    resolve(res);
+                  }
+                });
+              });
+              if (bgRes && bgRes.success && bgRes.html) {
+                const parsed = window.GoogleFormParser ? window.GoogleFormParser.parseFormHtml(bgRes.html) : null;
+                if (parsed && parsed.questions && parsed.questions.length > 0) {
+                  formData = {
+                    success: true,
+                    url: url,
+                    title: parsed.title,
+                    description: parsed.description,
+                    questions: parsed.questions
+                  };
+                }
+              }
+            } catch (e) {
+              console.warn("[Scanner] Extension background fetch skipped:", e);
+            }
           }
         }
 

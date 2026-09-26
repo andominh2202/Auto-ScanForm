@@ -31,7 +31,8 @@
   ],
   "host_permissions": [
     "https://docs.google.com/*",
-    "https://forms.gle/*"
+    "https://forms.gle/*",
+    "<all_urls>"
   ],
   "content_scripts": [
     {
