@@ -481,24 +481,104 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         currentScannedUrl = url;
 
-        // Gọi proxy API trên local server
-        const apiUrl = `/api/scan-form?url=${encodeURIComponent(url)}`;
-        let response = null;
-        try {
-          const res = await fetch(apiUrl);
-          if (res.ok) {
-            response = await res.json();
+        // 1. Nếu đang chạy trong Chrome Extension: Yêu cầu background service worker fetch trực tiếp
+        if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.sendMessage) {
+          try {
+            const bgRes = await new Promise((resolve) => {
+              chrome.runtime.sendMessage({ action: "FETCH_GFORM_HTML", url }, res => {
+                if (chrome.runtime.lastError || !res) {
+                  resolve(null);
+                } else {
+                  resolve(res);
+                }
+              });
+            });
+            if (bgRes && bgRes.success && bgRes.html) {
+              const parsed = window.GoogleFormParser ? window.GoogleFormParser.parseFormHtml(bgRes.html) : null;
+              if (parsed && parsed.questions && parsed.questions.length > 0) {
+                formData = {
+                  success: true,
+                  url: url,
+                  title: parsed.title,
+                  description: parsed.description,
+                  questions: parsed.questions
+                };
+              }
+            }
+          } catch (e) {
+            console.warn("[Scanner] Extension background fetch skipped:", e);
           }
-        } catch (netErr) {
-          console.warn("[Scanner] Lỗi kết nối API:", netErr);
         }
 
-        if (response && response.success && response.questions && response.questions.length > 0) {
-          formData = response;
-          currentScannedUrl = response.url || url;
-        } else {
-          throw new Error((response && response.error) || "Không thể tải cấu trúc biểu mẫu từ đường dẫn này. Vui lòng kiểm tra lại link Google Form đã được chia sẻ công khai.");
+        // 2. Nếu đang chạy local (localhost/127.0.0.1): Thử gọi qua Python server proxy
+        if (!formData && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+          try {
+            const apiUrl = `/api/scan-form?url=${encodeURIComponent(url)}`;
+            const res = await fetch(apiUrl);
+            if (res.ok) {
+              const json = await res.json();
+              if (json && json.success && json.questions && json.questions.length > 0) {
+                formData = json;
+              }
+            }
+          } catch (netErr) {
+            console.warn("[Scanner] Local proxy fetch skipped:", netErr);
+          }
         }
+
+        // 3. Nếu chạy trên GitHub Pages (andominh2202.github.io) hoặc static web: Dùng Cloud CORS Proxy Jina Reader
+        if (!formData) {
+          try {
+            const jinaUrl = `https://r.jina.ai/${url}`;
+            const res = await fetch(jinaUrl, {
+              headers: { "X-Return-Format": "html" }
+            });
+            if (res.ok) {
+              const html = await res.text();
+              const parsed = window.GoogleFormParser ? window.GoogleFormParser.parseFormHtml(html) : null;
+              if (parsed && parsed.questions && parsed.questions.length > 0) {
+                formData = {
+                  success: true,
+                  url: url,
+                  title: parsed.title,
+                  description: parsed.description,
+                  questions: parsed.questions
+                };
+              }
+            }
+          } catch (jinaErr) {
+            console.warn("[Scanner] Jina cloud proxy failed:", jinaErr);
+          }
+        }
+
+        // 4. Fallback qua AllOrigins
+        if (!formData) {
+          try {
+            const allOriginsUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+            const res = await fetch(allOriginsUrl);
+            if (res.ok) {
+              const html = await res.text();
+              const parsed = window.GoogleFormParser ? window.GoogleFormParser.parseFormHtml(html) : null;
+              if (parsed && parsed.questions && parsed.questions.length > 0) {
+                formData = {
+                  success: true,
+                  url: url,
+                  title: parsed.title,
+                  description: parsed.description,
+                  questions: parsed.questions
+                };
+              }
+            }
+          } catch (aoErr) {
+            console.warn("[Scanner] AllOrigins fallback failed:", aoErr);
+          }
+        }
+
+        if (!formData || !formData.questions || formData.questions.length === 0) {
+          throw new Error("Không thể tải cấu trúc biểu mẫu từ đường dẫn này. Vui lòng đảm bảo form được chia sẻ công khai hoặc cài đặt Extension để quét trực tiếp!");
+        }
+
+        currentScannedUrl = formData.url || url;
       }
 
       currentScannedData = formData;

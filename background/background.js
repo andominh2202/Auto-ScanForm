@@ -56,3 +56,18 @@ chrome.commands.onCommand.addListener((command, tab) => {
     });
   }
 });
+
+// Hỗ trợ fetch HTML Google Forms từ background service worker (Bypass CORS)
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.action === "FETCH_GFORM_HTML" && msg.url) {
+    fetch(msg.url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+      }
+    })
+      .then(res => res.text())
+      .then(html => sendResponse({ success: true, html }))
+      .catch(err => sendResponse({ success: false, error: err.message }));
+    return true; // Giữ kênh sendResponse bất đồng bộ
+  }
+});

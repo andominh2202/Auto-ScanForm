@@ -23,7 +23,8 @@ const GoogleFormParser = (function () {
     if (!html || typeof html !== "string") return null;
 
     // Tìm biến toàn cục FB_PUBLIC_LOAD_DATA_ trong mã nguồn Google Forms
-    const match = html.match(/var\s+FB_PUBLIC_LOAD_DATA_\s*=\s*(.*?);\s*<\/script>/s);
+    const match = html.match(/var\s+FB_PUBLIC_LOAD_DATA_\s*=\s*([\s\S]*?);\s*<\/script>/) ||
+                  html.match(/FB_PUBLIC_LOAD_DATA_\s*=\s*(\[[\s\S]*?\]);\s*<\/script>/);
     if (!match) return null;
 
     try {
