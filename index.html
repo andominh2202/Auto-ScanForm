@@ -349,9 +349,26 @@
                 <select id="scanner-profile-select" class="input-select-inline"></select>
               </div>
               <div class="scanner-demo-links">
-                <span>Hoặc thử mẫu demo:</span>
-                <button class="btn-demo-link" id="btn-load-demo-survey">📋 Khảo Sát Demo</button>
-                <button class="btn-demo-link" id="btn-load-demo-job">💼 Ứng Tuyển Demo</button>
+                <button class="btn-demo-link" id="btn-toggle-paste-html">📝 Dán Mã Nguồn HTML Form</button>
+                <span>| Demo:</span>
+                <button class="btn-demo-link" id="btn-load-demo-survey">📋 Khảo Sát</button>
+                <button class="btn-demo-link" id="btn-load-demo-job">💼 Ứng Tuyển</button>
+              </div>
+            </div>
+
+            <!-- Optional HTML Paste Fallback -->
+            <div class="scanner-paste-box" id="scanner-paste-box" style="display: none; margin-top: 14px; padding: 14px; background: var(--bg-card-subtle); border: 1px dashed var(--border); border-radius: 10px;">
+              <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 8px;">
+                💡 <strong>Mẹo vượt bảo mật Google trên GitHub Pages:</strong> Mở link Google Form &rarr; Nhấn <strong>Ctrl + U</strong> (Xem nguồn trang) &rarr; Nhấn <strong>Ctrl + A</strong> &rarr; <strong>Ctrl + C</strong> &rarr; Dán vào khung dưới đây:
+              </p>
+              <textarea id="scanner-html-input" class="input-text-scan input-textarea-scan" style="height: 100px; font-family: monospace; font-size: 11.5px;" placeholder="Dán mã nguồn HTML của Google Form (bắt đầu bằng &lt;!DOCTYPE html&gt;...) vào đây..."></textarea>
+              <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button class="btn btn-secondary btn-sm" id="btn-parse-pasted-html">
+                  <span>⚡</span> Bóc Tách Câu Hỏi Từ Mã HTML
+                </button>
+                <button class="btn btn-outline btn-sm" id="btn-close-paste-html">
+                  Đóng
+                </button>
               </div>
             </div>
           </div>

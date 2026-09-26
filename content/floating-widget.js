@@ -469,6 +469,23 @@
     }
   });
 
+  // Cầu nối giao tiếp Web Dashboard (GitHub Pages) -> Background Extension để bypass CORS
+  window.addEventListener("message", event => {
+    if (event.source !== window || !event.data || event.data.type !== "FM_FETCH_GFORM") return;
+    const targetUrl = event.data.url;
+    if (!targetUrl || typeof chrome === "undefined" || !chrome.runtime || !chrome.runtime.sendMessage) return;
+
+    chrome.runtime.sendMessage({ action: "FETCH_GFORM_HTML", url: targetUrl }, response => {
+      window.postMessage({
+        type: "FM_FETCH_GFORM_RESPONSE",
+        url: targetUrl,
+        success: Boolean(response && response.success),
+        html: response && response.html ? response.html : null,
+        error: response && response.error ? response.error : null
+      }, "*");
+    });
+  });
+
   // Tự động khởi chạy
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {

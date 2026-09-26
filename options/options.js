@@ -41,6 +41,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const btnOpenPrefilled = document.getElementById("btn-open-prefilled");
   const btnCopyPrefilled = document.getElementById("btn-copy-prefilled");
   const btnRescan = document.getElementById("btn-rescan");
+  const btnTogglePasteHtml = document.getElementById("btn-toggle-paste-html");
+  const scannerPasteBox = document.getElementById("scanner-paste-box");
+  const scannerHtmlInput = document.getElementById("scanner-html-input");
+  const btnParsePastedHtml = document.getElementById("btn-parse-pasted-html");
+  const btnClosePasteHtml = document.getElementById("btn-close-paste-html");
 
   // Playground Elements
   const pgProfilePicker = document.getElementById("pg-profile-picker");
@@ -510,7 +515,43 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         }
 
-        // 2. Nếu đang chạy local (localhost/127.0.0.1): Thử gọi qua Python server proxy
+        // 2. Thử gọi qua Content Script Bridge (nếu mở trên GitHub Pages nhưng trình duyệt ĐÃ CÀI Extension)
+        if (!formData) {
+          try {
+            const bridgeRes = await new Promise(resolve => {
+              const timer = setTimeout(() => {
+                window.removeEventListener("message", handler);
+                resolve(null);
+              }, 1200);
+              const handler = ev => {
+                if (ev.data && ev.data.type === "FM_FETCH_GFORM_RESPONSE" && ev.data.url === url) {
+                  clearTimeout(timer);
+                  window.removeEventListener("message", handler);
+                  resolve(ev.data);
+                }
+              };
+              window.addEventListener("message", handler);
+              window.postMessage({ type: "FM_FETCH_GFORM", url }, "*");
+            });
+
+            if (bridgeRes && bridgeRes.success && bridgeRes.html) {
+              const parsed = window.GoogleFormParser ? window.GoogleFormParser.parseFormHtml(bridgeRes.html) : null;
+              if (parsed && parsed.questions && parsed.questions.length > 0) {
+                formData = {
+                  success: true,
+                  url: url,
+                  title: parsed.title,
+                  description: parsed.description,
+                  questions: parsed.questions
+                };
+              }
+            }
+          } catch (e) {
+            console.warn("[Scanner] Content script bridge skipped:", e);
+          }
+        }
+
+        // 3. Nếu đang chạy local (localhost/127.0.0.1): Thử gọi qua Python server proxy
         if (!formData && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
           try {
             const apiUrl = `/api/scan-form?url=${encodeURIComponent(url)}`;
@@ -526,56 +567,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
         }
 
-        // 3. Nếu chạy trên GitHub Pages (andominh2202.github.io) hoặc static web: Dùng Cloud CORS Proxy Jina Reader
-        if (!formData) {
-          try {
-            const jinaUrl = `https://r.jina.ai/${url}`;
-            const res = await fetch(jinaUrl, {
-              headers: { "X-Return-Format": "html" }
-            });
-            if (res.ok) {
-              const html = await res.text();
-              const parsed = window.GoogleFormParser ? window.GoogleFormParser.parseFormHtml(html) : null;
-              if (parsed && parsed.questions && parsed.questions.length > 0) {
-                formData = {
-                  success: true,
-                  url: url,
-                  title: parsed.title,
-                  description: parsed.description,
-                  questions: parsed.questions
-                };
-              }
-            }
-          } catch (jinaErr) {
-            console.warn("[Scanner] Jina cloud proxy failed:", jinaErr);
-          }
-        }
-
-        // 4. Fallback qua AllOrigins
-        if (!formData) {
-          try {
-            const allOriginsUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-            const res = await fetch(allOriginsUrl);
-            if (res.ok) {
-              const html = await res.text();
-              const parsed = window.GoogleFormParser ? window.GoogleFormParser.parseFormHtml(html) : null;
-              if (parsed && parsed.questions && parsed.questions.length > 0) {
-                formData = {
-                  success: true,
-                  url: url,
-                  title: parsed.title,
-                  description: parsed.description,
-                  questions: parsed.questions
-                };
-              }
-            }
-          } catch (aoErr) {
-            console.warn("[Scanner] AllOrigins fallback failed:", aoErr);
-          }
-        }
-
         if (!formData || !formData.questions || formData.questions.length === 0) {
-          throw new Error("Không thể tải cấu trúc biểu mẫu từ đường dẫn này. Vui lòng đảm bảo form được chia sẻ công khai hoặc cài đặt Extension để quét trực tiếp!");
+          if (scannerPasteBox) {
+            scannerPasteBox.style.display = "block";
+            if (scannerHtmlInput) scannerHtmlInput.focus();
+          }
+          throw new Error("Google chặn kết nối CORS từ web tĩnh GitHub Pages.\n\n👉 Bạn hãy làm theo 1 trong 2 cách sau để bóc tách ngay:\n1. Mở trang Google Form -> Bấm phím Ctrl + U (Xem nguồn trang) -> Ctrl + A -> Ctrl + C -> Dán vào khung bên dưới và bấm 'Bóc Tách'!\n2. Hoặc mở ứng dụng tại máy cá nhân: http://localhost:3000");
         }
 
         currentScannedUrl = formData.url || url;
@@ -808,6 +805,64 @@ document.addEventListener("DOMContentLoaded", async () => {
           showToast(`Đã đổi sang hồ sơ "${selectedProf.name}"!`, "🔄");
         }
       }
+    });
+  }
+
+  // Xử lý dán mã nguồn HTML trực tiếp (Vượt qua 100% rào cản CORS trên GitHub Pages)
+  function parseHtmlAndDisplay(html, formUrl = "") {
+    if (!html || typeof html !== "string") return;
+    saveCurrentProfileFromInputs();
+    const selectedProfId = scannerProfileSelect ? scannerProfileSelect.value : currentProfileId;
+    const activeProf = profiles.find(p => p.id === selectedProfId) || profiles[0];
+
+    const parsed = window.GoogleFormParser ? window.GoogleFormParser.parseFormHtml(html) : null;
+    if (!parsed || !parsed.questions || parsed.questions.length === 0) {
+      alert("Không tìm thấy cấu trúc câu hỏi nào trong mã nguồn HTML vừa dán.\n\n👉 Vui lòng đảm bảo bạn mở đúng trang Google Form, bấm Ctrl + U rồi nhấn Ctrl + A và Ctrl + C để sao chép toàn bộ mã nguồn.");
+      return;
+    }
+
+    currentScannedUrl = formUrl || (scannerUrlInput ? scannerUrlInput.value.trim() : "") || "https://docs.google.com/forms";
+    currentScannedData = {
+      success: true,
+      url: currentScannedUrl,
+      title: parsed.title,
+      description: parsed.description,
+      questions: parsed.questions
+    };
+
+    if (window.GoogleFormParser) {
+      currentMappedQuestions = window.GoogleFormParser.mapQuestionsWithProfile(parsed.questions, activeProf);
+    } else {
+      currentMappedQuestions = parsed.questions.map(q => ({ ...q, mappedValue: "", confidence: 0 }));
+    }
+
+    renderScannedResults(currentScannedData, currentMappedQuestions);
+    if (scannerPasteBox) scannerPasteBox.style.display = "none";
+    showToast(`Đã bóc tách thành công ${parsed.questions.length} câu hỏi từ mã nguồn!`, "✨");
+  }
+
+  if (btnTogglePasteHtml && scannerPasteBox) {
+    btnTogglePasteHtml.addEventListener("click", () => {
+      const isHidden = scannerPasteBox.style.display === "none";
+      scannerPasteBox.style.display = isHidden ? "block" : "none";
+      if (isHidden && scannerHtmlInput) scannerHtmlInput.focus();
+    });
+  }
+
+  if (btnClosePasteHtml && scannerPasteBox) {
+    btnClosePasteHtml.addEventListener("click", () => {
+      scannerPasteBox.style.display = "none";
+    });
+  }
+
+  if (btnParsePastedHtml) {
+    btnParsePastedHtml.addEventListener("click", () => {
+      const html = scannerHtmlInput ? scannerHtmlInput.value.trim() : "";
+      if (!html) {
+        alert("Vui lòng dán mã nguồn HTML của Google Form!");
+        return;
+      }
+      parseHtmlAndDisplay(html, scannerUrlInput ? scannerUrlInput.value.trim() : "");
     });
   }
 
